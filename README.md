@@ -1,5 +1,3 @@
-Sure, here's a GitHub project description for the previously described tool:
-
 ---
 
 ## Kubernetes CLI Tool
