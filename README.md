@@ -1,6 +1,4 @@
----
-
-## Kubernetes CLI Tool
+# Kubernetes CLI Tool
 
 **Project Description:**
 
