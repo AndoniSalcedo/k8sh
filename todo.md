@@ -1,0 +1,1 @@
+-   BERT model to kubernetes syntax
