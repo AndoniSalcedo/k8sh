@@ -1,9 +1,9 @@
 import torch
 from transformers import BertTokenizer, BertForMaskedLM
 
-model_name = "bert-base-uncased"
-tokenizer = BertTokenizer.from_pretrained(model_name)
-model = BertForMaskedLM.from_pretrained(model_name)
+#model_name = "bert-base-uncased"
+#tokenizer = BertTokenizer.from_pretrained(model_name)
+#model = BertForMaskedLM.from_pretrained(model_name)
 
 def syntax_correct(user_input):
 
@@ -30,3 +30,4 @@ def syntax_correct(user_input):
     # Postprocesamiento: Convertir tokens en un comando corregido
     corrected_command = ' '.join(corrected_tokens).replace(' ##', '').replace(' .', '.').replace(' ,', ',')
     return corrected_command
+
