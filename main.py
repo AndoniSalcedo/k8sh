@@ -1,13 +1,8 @@
 import subprocess
 import re
-import readline
 
 from prompt_toolkit import prompt
 from custom_completer import CustomCompleter
-
-
-current_namespace = "default"
-
 
 def get_available_namespaces():
     result = subprocess.run("kubectl get namespaces --no-headers", shell=True, capture_output=True, text=True)
@@ -16,8 +11,7 @@ def get_available_namespaces():
     return namespaces
 
 def main():
-    global current_namespace, options
-
+    current_namespace = "default"
     
     available_namespaces = get_available_namespaces()
 
