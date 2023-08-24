@@ -2,7 +2,10 @@ import subprocess
 import re
 
 from prompt_toolkit import prompt
+from prompt_toolkit.history import FileHistory
 from custom_completer import CustomCompleter
+
+
 
 def get_available_namespaces():
     result = subprocess.run("kubectl get namespaces --no-headers", shell=True, capture_output=True, text=True)
@@ -12,17 +15,19 @@ def get_available_namespaces():
 
 def main():
     current_namespace = "default"
-    
+    history_file = ".k8sh_history"
+
     available_namespaces = get_available_namespaces()
 
     completer = CustomCompleter()
+    history = FileHistory(history_file)
 
     while True:
 
         try:
             #prompt_text = f"\033[1;32m\033[1m({current_namespace}) $\033[0m "
             prompt_text = f"({current_namespace}) $ "
-            user_input = prompt(prompt_text, completer=completer)
+            user_input = prompt(prompt_text, completer=completer,history=history)
 
             user_input = re.sub(r'\s+', ' ', user_input).strip().lower()  
 
