@@ -3,47 +3,10 @@ import re
 import readline
 
 from prompt_toolkit import prompt
-from prompt_toolkit.completion import Completer, Completion
+from custom_completer import CustomCompleter
 
 
 current_namespace = "default"
-
-options = set([
-    "create",
-    "apply",
-    "get",
-    "describe",
-    "edit",
-    "delete",
-    "logs",
-    "exec",
-    "scale",
-    "rollout",
-    "expose",
-    "attach",
-    "port-forward",
-    "proxy",
-    "auth",
-    "api-resources",
-    "top",
-    "config",
-    "version",
-    # Custom verbs
-    "use",
-    "exit"
-])
-
-class MyCompleter(Completer):
-    def get_completions(self, document, complete_event):
-        word = document.get_word_before_cursor()
-
-        if document.char_before_cursor == ' ':
-            return
-        
-        
-        for option in options:
-            if option.startswith(word):
-                yield Completion(option, start_position=-len(word))
 
 
 def get_available_namespaces():
@@ -58,7 +21,7 @@ def main():
     
     available_namespaces = get_available_namespaces()
 
-    completer = MyCompleter()
+    completer = CustomCompleter()
 
     while True:
 
@@ -72,7 +35,7 @@ def main():
             if user_input == "exit":
                 break
             
-            if user_input.startswith("use "):
+            if user_input.startswith("use"):
                 new_namespace = user_input.split(" ")[1]
                 if new_namespace in available_namespaces:
                     current_namespace = new_namespace
@@ -81,6 +44,10 @@ def main():
                     print(f"Namespace '{new_namespace}' no encontrado")
                 continue
 
+
+            if user_input.startswith("reset"):
+                completer.reset_options()
+                
             user_input = f"{user_input} -n {current_namespace}"
 
             if not user_input.startswith("kubectl"):
@@ -92,8 +59,8 @@ def main():
             print(combined_output)
 
             if result.returncode == 0:
-                ''''''
-                options.update(user_input.split(" "))
+                completer.add_options(user_input.split(" "))
+
         except KeyboardInterrupt:
             print("\nPara salir del programa, escribe 'exit'")
         except Exception as e:
