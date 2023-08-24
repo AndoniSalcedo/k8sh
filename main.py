@@ -41,6 +41,7 @@ def main():
 
             if user_input.startswith("reset"):
                 completer.reset_options()
+                continue
                 
             user_input = f"{user_input} -n {current_namespace}"
 
