@@ -24,31 +24,38 @@ default_options = [
     # Custom verbs
     "use",
     "exit",
-    "reset"
+    "reset",
 ]
+
 
 class CustomCompleter(Completer):
     """Clase que proporciona autocompletado personalizado para comandos de Kubernetes."""
 
-    def __init__(self):
+    def __init__(self, history):
         """Inicializa la instancia del autocompletador."""
         self.options = set(default_options)
-    
+        self.history = history
+
     def get_completions(self, document, complete_event):
         """Obtiene las opciones de autocompletado para el comando actual."""
         word = document.get_word_before_cursor()
+        line = document.current_line_before_cursor
 
-        if document.char_before_cursor == ' ':
+        if document.char_before_cursor == " ":
             return
+
+        for prev_command in reversed(self.history.get_strings()):
+            if prev_command.startswith(line) and len(line.split(" ")) > 2:
+                yield Completion(prev_command, start_position=-len(line))
 
         for option in self.options:
             if option.startswith(word):
                 yield Completion(option, start_position=-len(word))
-    
+
     def add_options(self, new_options):
         """Añade nuevas opciones al conjunto de opciones de autocompletado."""
         self.options.update(new_options)
-    
+
     def reset_options(self):
         """Restablece las opciones de autocompletado a su estado inicial."""
         initial_options = set(default_options)
