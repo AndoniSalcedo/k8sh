@@ -1,9 +1,11 @@
 import subprocess
 import re
-from prompt_toolkit import prompt
+from prompt_toolkit.shortcuts import prompt, CompleteStyle
 from prompt_toolkit.history import FileHistory
 from custom_completer import CustomCompleter
+from prompt_toolkit.styles import Style
 import os
+from prompt_toolkit import HTML
 
 def change_directory(user_input):
     new_directory = user_input[3:].strip()
@@ -23,6 +25,14 @@ linux_commands = [
     "kubectl"
 ]
 
+style = Style.from_dict(
+    {
+        "path": "#33E0FF bold", 
+        "symbol": "#3341FF bold", 
+        "namespace": "#FF1818 bold",
+        "start": "#FFFF00 bold",  
+    }
+)
 
 
 def get_available_namespaces():
@@ -66,8 +76,8 @@ def main():
 
     while True:
         try:
-            prompt_text = f"{current_directory} ({current_namespace}) $ "
-            user_input = prompt(prompt_text, completer=completer, history=history)
+            prompt_text =  HTML(f"<path>{current_directory}</path> <symbol>(</symbol><namespace>{current_namespace}</namespace><symbol>)</symbol> <start>$</start> ")
+            user_input = prompt(prompt_text, completer=completer, history=history,complete_style=CompleteStyle.MULTI_COLUMN,style=style)
 
             user_input = re.sub(r"\s+", " ", user_input).strip().lower()
 
