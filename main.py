@@ -112,7 +112,10 @@ def main():
                 style=style,
             )
 
-            user_input = re.sub(r"\s+", " ", user_input).strip().lower()
+            user_input = re.sub(r"\s+", " ", user_input).strip()
+
+            if user_input == "":
+                continue
 
             if user_input == "exit":
                 return

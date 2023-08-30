@@ -60,6 +60,13 @@ def print_directories(command):
                     start_position=0,
                     display=entry.name,
                 )
+
+        # Agregar la opción de autocompletado para el directorio padre ".."
+        yield Completion(
+            "..",
+            start_position=0,
+            display="..",
+        )
     else:
         base_directory = current_directory / "/".join(parts[:-1])
         for entry in base_directory.iterdir():
@@ -69,13 +76,6 @@ def print_directories(command):
                     start_position=-len(parts[-1]),
                     display=entry.name,
                 )
-
-
-"""     yield Completion(
-        "../",
-        start_position=0,
-        display="../",
-    ) """
 
 
 def none_func():
