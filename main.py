@@ -2,10 +2,12 @@ import subprocess
 import re
 from prompt_toolkit.shortcuts import prompt, CompleteStyle
 from prompt_toolkit.history import FileHistory
-from custom_completer import CustomCompleter
 from prompt_toolkit.styles import Style
+
+from custom_completer import CustomCompleter
 import os
 from prompt_toolkit import HTML
+
 
 def change_directory(user_input):
     new_directory = user_input[3:].strip()
@@ -17,20 +19,43 @@ special_commands = {
 }
 
 linux_commands = [
-    "ls", "cd", "pwd", "mkdir", "touch", "cp", "mv", "rm",
-    "cat", "echo", "nano","vim", "grep", "find", "chmod", "chown",
-    "ps", "top","htop", "kill", "sudo", "df", "du", "history",
-    "tar", "wget", "curl", 
+    "ls",
+    "cd",
+    "pwd",
+    "mkdir",
+    "touch",
+    "cp",
+    "mv",
+    "rm",
+    "cat",
+    "echo",
+    "nano",
+    "vim",
+    "grep",
+    "find",
+    "chmod",
+    "chown",
+    "ps",
+    "top",
+    "htop",
+    "kill",
+    "sudo",
+    "df",
+    "du",
+    "history",
+    "tar",
+    "wget",
+    "curl",
     # Extra commands
-    "kubectl"
+    "kubectl",
 ]
 
 style = Style.from_dict(
     {
-        "path": "#33E0FF bold", 
-        "symbol": "#3341FF bold", 
+        "path": "#33E0FF bold",
+        "symbol": "#1848FF bold",
         "namespace": "#FF1818 bold",
-        "start": "#FFFF00 bold",  
+        "start": "#FFFF00 bold",
     }
 )
 
@@ -76,8 +101,16 @@ def main():
 
     while True:
         try:
-            prompt_text =  HTML(f"<path>{current_directory}</path> <symbol>(</symbol><namespace>{current_namespace}</namespace><symbol>)</symbol> <start>$</start> ")
-            user_input = prompt(prompt_text, completer=completer, history=history,complete_style=CompleteStyle.MULTI_COLUMN,style=style)
+            prompt_text = HTML(
+                f"<path>{current_directory}</path> <symbol>(</symbol><namespace>{current_namespace}</namespace><symbol>)</symbol> <start>$</start> "
+            )
+            user_input = prompt(
+                prompt_text,
+                completer=completer,
+                history=history,
+                complete_style=CompleteStyle.MULTI_COLUMN,
+                style=style,
+            )
 
             user_input = re.sub(r"\s+", " ", user_input).strip().lower()
 
@@ -121,10 +154,9 @@ def main():
             )
             combined_output = result.stdout + result.stderr
 
-            
-            print(combined_output,end="")
+            print(combined_output, end="")
 
-            if result.returncode == 0 and user_input.startswith("kubectl") :
+            if result.returncode == 0 and user_input.startswith("kubectl"):
                 completer.add_options(user_input.split(" "))
 
         except KeyboardInterrupt:
