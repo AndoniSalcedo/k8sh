@@ -60,8 +60,6 @@ def print_directories(command):
                     start_position=0,
                     display=entry.name,
                 )
-
-        # Agregar la opción de autocompletado para el directorio padre ".."
         yield Completion(
             "..",
             start_position=0,
@@ -133,6 +131,7 @@ class CustomCompleter(Completer):
             if line.startswith(option + " "):
                 for completion in self.linux_options[option](line):
                     yield completion
+                return
 
         if document.char_before_cursor == " ":
             return
