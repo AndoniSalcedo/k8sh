@@ -107,6 +107,7 @@ linux_options = {
     "history": none_func,
     "tar": none_func,
     "wget": none_func,
+    "clear": none_func,
     "curl": none_func,
 }
 
