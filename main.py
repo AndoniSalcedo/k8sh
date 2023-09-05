@@ -89,7 +89,10 @@ def main():
     """
     current_namespace = "default"
     current_directory = os.path.basename(os.getcwd())
-    history_file = __file__ + "/.k8sh_history"
+
+    history_file = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), ".k8sh_history"
+    )
 
     available_namespaces = get_available_namespaces()
 
