@@ -46,6 +46,7 @@ linux_commands = [
     "tar",
     "wget",
     "curl",
+    "clear"
     # Extra commands
     "kubectl",
 ]
@@ -88,7 +89,7 @@ def main():
     """
     current_namespace = "default"
     current_directory = os.path.basename(os.getcwd())
-    history_file = ".k8sh_history"
+    history_file = __file__ + "/.k8sh_history"
 
     available_namespaces = get_available_namespaces()
 
