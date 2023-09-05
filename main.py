@@ -1,9 +1,9 @@
 import os
 import subprocess
-import re
 from prompt_toolkit.shortcuts import prompt, CompleteStyle
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.styles import Style
+from prompt_toolkit import HTML
 from custom_completer import CustomCompleter
 
 style = Style.from_dict(
@@ -92,7 +92,9 @@ def main():
     while True:
         try:
             current_directory = os.path.basename(os.getcwd())
-            prompt_text = f"{current_directory} ({current_namespace}) $ "
+            prompt_text = HTML(
+                f"<path>{current_directory}</path> <symbol>(</symbol><namespace>{current_namespace}</namespace><symbol>)</symbol> <start>$</start> "
+            )
             user_input = prompt(
                 prompt_text,
                 completer=completer,
