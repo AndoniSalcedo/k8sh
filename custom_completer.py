@@ -76,7 +76,7 @@ def print_directories(command):
                 )
 
 
-def none_func():
+def none_func(cmd):
     return []
 
 
@@ -137,7 +137,7 @@ class CustomCompleter(Completer):
         if document.char_before_cursor == " ":
             return
 
-        for prev_command in reversed(self.history.get_strings()):
+        for prev_command in reversed(list(set(self.history.get_strings()))):
             if prev_command.startswith(line) and len(line.split(" ")) > 2:
                 yield Completion(
                     prev_command,
