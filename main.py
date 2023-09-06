@@ -46,7 +46,7 @@ linux_commands = [
     "tar",
     "wget",
     "curl",
-    "clear"
+    "clear",
     # Extra commands
     "kubectl",
 ]
