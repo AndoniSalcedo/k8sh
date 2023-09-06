@@ -47,6 +47,7 @@ linux_commands = [
     "wget",
     "curl",
     "clear",
+    "watch",
     # Extra commands
     "kubectl",
 ]

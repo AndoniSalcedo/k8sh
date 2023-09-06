@@ -109,6 +109,7 @@ linux_options = {
     "wget": none_func,
     "clear": none_func,
     "curl": none_func,
+    "watch": none_func,
 }
 
 
