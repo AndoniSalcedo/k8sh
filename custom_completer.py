@@ -76,7 +76,7 @@ def print_directories(command):
                 )
 
 
-def none_func():
+def none_func(cmd):
     return []
 
 
