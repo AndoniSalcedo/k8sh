@@ -7,6 +7,7 @@ from prompt_toolkit.styles import Style
 from custom_completer import CustomCompleter
 import os
 from prompt_toolkit import HTML
+import argparse
 
 
 def change_directory(user_input):
@@ -84,6 +85,19 @@ def get_available_namespaces():
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Kubernetes CLI Tool.")
+
+    parser.add_argument(
+        "--kubeconfig", type=str, help="ruta al archivo kubeconfig", default=None
+    )
+    args = parser.parse_args()
+
+    # Verifica si args.kubeconfig es None
+    if args.kubeconfig is None:
+        flags = ""
+    else:
+        flags = f"--kubeconfig {args.kubeconfig}"
+
     """
     Función principal que ejecuta el bucle principal de la aplicación.
     Permite al usuario ingresar comandos, administrar namespaces y mostrar resultados.
@@ -152,7 +166,7 @@ def main():
                 continue
 
             if not any(user_input.startswith(commands) for commands in linux_commands):
-                user_input = f"kubectl  {user_input} -n {current_namespace}"
+                user_input = f"kubectl {flags}  -n {current_namespace} {user_input}"
 
             result = subprocess.run(
                 user_input,
