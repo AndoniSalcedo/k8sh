@@ -135,9 +135,6 @@ class CustomCompleter(Completer):
                     yield completion
                 return
 
-        if document.char_before_cursor == " ":
-            return
-
         for prev_command in reversed(list(set(self.history.get_strings()))):
             if prev_command.startswith(line) and len(line.split(" ")) > 2:
                 yield Completion(
@@ -145,6 +142,8 @@ class CustomCompleter(Completer):
                     start_position=-len(line),
                     display=HTML("<b>%s</b>") % prev_command,
                 )
+        if document.char_before_cursor == " ":
+            return
 
         for option in self.k8s_options:
             if option.startswith(word):

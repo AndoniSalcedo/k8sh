@@ -152,7 +152,7 @@ def main():
                 continue
 
             if not any(user_input.startswith(commands) for commands in linux_commands):
-                user_input = f"kubectl  {user_input} -n {current_namespace}"
+                user_input = f"kubectl  -n {current_namespace} {user_input}"
 
             result = subprocess.run(
                 user_input,
