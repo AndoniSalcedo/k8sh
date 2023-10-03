@@ -63,13 +63,13 @@ style = Style.from_dict(
 )
 
 
-def get_available_namespaces():
+def get_available_namespaces(flags):
     """
     Obtiene una lista de los nombres de los namespaces disponibles en Kubernetes.
     Utiliza el comando 'kubectl get namespaces --no-headers' para obtener la lista.
     """
     result = subprocess.run(
-        "kubectl get namespaces --no-headers",
+        f"kubectl {flags} get namespaces --no-headers",
         shell=True,
         capture_output=True,
         text=True,
@@ -109,7 +109,7 @@ def main():
         os.path.dirname(os.path.abspath(__file__)), ".k8sh_history"
     )
 
-    available_namespaces = get_available_namespaces()
+    available_namespaces = get_available_namespaces(flags)
 
     if available_namespaces == None:
         return
@@ -140,7 +140,7 @@ def main():
                 return
 
             if user_input.startswith("use"):
-                available_namespaces = get_available_namespaces()
+                available_namespaces = get_available_namespaces(flags)
                 new_namespace = user_input.split(" ")[1]
                 if new_namespace in available_namespaces:
                     current_namespace = new_namespace
