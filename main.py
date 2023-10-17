@@ -9,16 +9,6 @@ import os
 from prompt_toolkit import HTML
 import argparse
 
-
-def change_directory(user_input):
-    new_directory = user_input[3:].strip()
-    os.chdir(new_directory)
-
-
-special_commands = {
-    "cd": change_directory,
-}
-
 linux_commands = [
     "ls",
     "cd",
@@ -52,6 +42,25 @@ linux_commands = [
     # Extra commands
     "kubectl",
 ]
+
+
+def change_directory(user_input: str):
+    new_directory = user_input[3:].strip()
+    os.chdir(new_directory)
+
+
+def watch(user_input: str):
+    if not any(commands in user_input for commands in linux_commands):
+        user_input = f"kubectl {user_input}"
+
+    subprocess.run(
+        user_input,
+        shell=True,
+    )
+
+
+special_commands = {"cd": change_directory, "watch": watch}
+
 
 style = Style.from_dict(
     {
