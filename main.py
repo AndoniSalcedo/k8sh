@@ -73,7 +73,8 @@ def main():
                 available_namespaces = get_namespaces(Configuration().flags)
                 new_namespace = user_input.split(" ")[1]
                 if new_namespace in available_namespaces:
-                    current_namespace = new_namespace
+                    Configuration.set_namespace(new_namespace)
+
                     print(f"Namespace cambiado a '{Configuration().current_namespace}'")
                 else:
                     print(f"Namespace '{new_namespace}' no encontrado")
@@ -83,7 +84,9 @@ def main():
                 completer.reset_options()
                 continue
 
-            user_input = f"kubectl {flags} -n {current_namespace} {user_input}"
+            user_input = (
+                f"kubectl {flags} -n {Configuration().current_namespace} {user_input}"
+            )
 
             result = subprocess.run(
                 user_input,
