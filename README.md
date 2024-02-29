@@ -15,3 +15,9 @@ This project aims to simplify the interaction with Kubernetes clusters through a
 This project is designed to empower developers, system administrators, and Kubernetes enthusiasts by providing a convenient and accessible means of managing Kubernetes clusters and resources.
 
 ---
+
+## install
+
+`git clone -b bootstrap https://github.com/AndoniSalcedo/k8sh`
+
+`cd k8sh && ./install.sh`
