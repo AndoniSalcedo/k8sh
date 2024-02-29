@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Sphinx
+build/
+*.pickle
+
+# Compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+myenv/
+
+# Editors
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+.k8sh_history
+
+# Dependency files
+pip-lock.txt
+requirements.txt
+
+# Documentation
+docs/

@@ -1,0 +1,9 @@
+setup.py
+bootstrap/__init__.py
+bootstrap/main.py
+k8sh.egg-info/PKG-INFO
+k8sh.egg-info/SOURCES.txt
+k8sh.egg-info/dependency_links.txt
+k8sh.egg-info/entry_points.txt
+k8sh.egg-info/requires.txt
+k8sh.egg-info/top_level.txt
