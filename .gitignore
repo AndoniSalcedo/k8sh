@@ -1,0 +1,4 @@
+/app
+/bootstrap/__pycache__
+/k8sh*
+application_version.txt
