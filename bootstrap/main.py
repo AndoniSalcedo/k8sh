@@ -8,11 +8,13 @@ import os
 import shutil
 import sys
 
+script_path = os.path.dirname(os.path.abspath(__file__))
+
 github_user = "AndoniSalcedo"
 repository = "k8sh"
 # launcher_version_file = '/path/to/launcher_version.txt'
-application_version_file = "./application_version.txt"
-application_path = "./app"
+application_version_file = os.path.join(script_path,"../application_version.txt")
+application_path = os.path.join(script_path,"../app")
 # temp_path = '/temporary/path/for/update'
 
 
