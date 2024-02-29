@@ -56,6 +56,19 @@ def main():
             if user_input == "exit":
                 return
 
+            if user_input.startswith("clear"):
+                result = subprocess.run(
+                    "clear",
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+                combined_output = result.stdout + result.stderr
+
+                print(combined_output, end="")
+                continue
+
             if user_input.startswith("use"):
                 available_namespaces = get_namespaces(Configuration().flags)
                 new_namespace = user_input.split(" ")[1]
@@ -70,7 +83,7 @@ def main():
                 completer.reset_options()
                 continue
 
-            user_input = f"kubectl {flags}  -n {current_namespace} {user_input}"
+            user_input = f"kubectl {flags} -n {current_namespace} {user_input}"
 
             result = subprocess.run(
                 user_input,
@@ -82,9 +95,6 @@ def main():
             combined_output = result.stdout + result.stderr
 
             print(combined_output, end="")
-
-            if result.returncode == 0 and user_input.startswith("kubectl"):
-                completer.add_options(user_input.split(" "))
 
         except KeyboardInterrupt:
             print("\nPara salir del programa, escribe 'exit'")
