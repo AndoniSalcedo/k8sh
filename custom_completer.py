@@ -69,10 +69,13 @@ class CustomCompleter(Completer):
                             )
             """Autocompletar con comando anterior"""
             for prev_command in reversed(list(set(self.history.get_strings()))):
-                if prev_command.startswith(line) and len(line.split(" ")) > 2:
+                if (
+                    prev_command.startswith(document.current_line_before_cursor)
+                    and len(document.current_line_before_cursor.split(" ")) > 2
+                ):
                     yield Completion(
                         prev_command,
-                        start_position=-len(line),
+                        start_position=-len(document.current_line_before_cursor),
                         display=HTML("<b>%s</b>") % prev_command,
                     )
         except ParseException:
