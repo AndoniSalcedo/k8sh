@@ -1,116 +1,13 @@
 import shutil
+from exceptiongroup import catch
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit import HTML
-from pathlib import Path
-import os
+from api_service import get_resources
+from configuration import Configuration
 
-# Lista de opciones por defecto que se incluirán en el autocompletado.
-k8s_options = [
-    "create",
-    "apply",
-    "get",
-    "describe",
-    "edit",
-    "delete",
-    "logs",
-    "exec",
-    "scale",
-    "rollout",
-    "expose",
-    "attach",
-    "port-forward",
-    "proxy",
-    "auth",
-    "api-resources",
-    "top",
-    "config",
-    "version",
-    # Custom verbs
-    "use",
-    "exit",
-    "reset",
-]
-
-
-def print_files():
-    current_directory = Path(os.getcwd())
-    for entry in current_directory.iterdir():
-        if entry.is_dir():
-            display = HTML("<b>%s/</b>") % entry.name
-        else:
-            display = HTML("<i>%s</i>") % entry.name
-        yield Completion(entry.name, start_position=-len(entry.name), display=display)
-
-
-def print_directories(command):
-    current_directory = Path(os.getcwd())
-    user_input = (
-        command.split(maxsplit=1)[-1] if len(command.split(maxsplit=1)) > 1 else ""
-    )
-
-    parts = user_input.split("/")
-
-    if parts[-1] == "":
-        parts.pop()
-        base_directory = current_directory / "/".join(parts)
-        for entry in base_directory.iterdir():
-            if entry.is_dir():
-                yield Completion(
-                    entry.name,
-                    start_position=0,
-                    display=entry.name,
-                )
-        yield Completion(
-            "..",
-            start_position=0,
-            display="..",
-        )
-    else:
-        base_directory = current_directory / "/".join(parts[:-1])
-        for entry in base_directory.iterdir():
-            if entry.is_dir() and entry.name.startswith(parts[-1]):
-                yield Completion(
-                    entry.name,
-                    start_position=-len(parts[-1]),
-                    display=entry.name,
-                )
-
-
-def none_func(cmd):
-    return []
-
-
-linux_options = {
-    "ls": none_func,
-    "cd": print_directories,
-    "pwd": none_func,
-    "mkdir": none_func,
-    "touch": none_func,
-    "cp": none_func,
-    "mv": none_func,
-    "rm": none_func,
-    "cat": none_func,
-    "echo": none_func,
-    "nano": none_func,
-    "vim": none_func,
-    "grep": none_func,
-    "find": none_func,
-    "chmod": none_func,
-    "chown": none_func,
-    "ps": none_func,
-    "top": none_func,
-    "htop": none_func,
-    "kill": none_func,
-    "sudo": none_func,
-    "df": none_func,
-    "du": none_func,
-    "history": none_func,
-    "tar": none_func,
-    "wget": none_func,
-    "clear": none_func,
-    "curl": none_func,
-    "watch": none_func,
-}
+from grammar import kubectlCommand, typeCommand
+from constants import k8s_resources, k8s_all_verbs
+from pyparsing import ParseException
 
 
 class CustomCompleter(Completer):
@@ -118,8 +15,7 @@ class CustomCompleter(Completer):
 
     def __init__(self, history):
         """Inicializa la instancia del autocompletador."""
-        self.k8s_options = set(k8s_options)
-        self.linux_options = linux_options
+
         self.history = history
 
     def get_completions(self, document, complete_event):
@@ -127,14 +23,64 @@ class CustomCompleter(Completer):
         word = document.get_word_before_cursor()
         line = document.current_line_before_cursor
 
+        if line.endswith(" ") or " " not in line:
+            line = line.strip()
+        else:
+            line = line[: line.rfind(" ")].strip()
+
         terminal_width, _ = shutil.get_terminal_size()
 
-        for option in self.linux_options:
-            if line.startswith(option + " "):
-                for completion in self.linux_options[option](line):
-                    yield completion
-                return
+        try:
+            parsed = kubectlCommand.parseString(line, parseAll=True)
 
+            next = list(parsed.keys()).pop()
+
+            parts = next.split(" ")
+
+            for part in parts:
+
+                if part == "flags":
+                    """"""
+                if part == "name":
+                    type = "pods"
+
+                    for w in line.split(" "):
+                        parsed = typeCommand.parseString(w, parseAll=True)
+                        for key in parsed.keys():
+                            if key == "resource":
+                                type = parsed[key]
+                    resources = get_resources(
+                        Configuration().flags, Configuration().current_namespace, type
+                    )
+
+                    for resource in resources:
+                        if resource.startswith(word):
+                            display_width = (terminal_width // 3) - 2
+                            display = HTML("<b>%s</b>") % resource.ljust(display_width)
+                            yield Completion(
+                                resource, start_position=-len(word), display=display
+                            )
+
+                if part == "resource":
+                    for resource in k8s_resources:
+                        if resource.startswith(word):
+                            display_width = (terminal_width // 3) - 2
+                            display = HTML("<b>%s</b>") % resource.ljust(display_width)
+                            yield Completion(
+                                resource, start_position=-len(word), display=display
+                            )
+
+        except ParseException:
+            if line:
+                for verb in k8s_all_verbs:
+                    if verb.startswith(word):
+                        display_width = (terminal_width // 3) - 2
+                        display = HTML("<b>%s</b>") % verb.ljust(display_width)
+                        yield Completion(
+                            verb, start_position=-len(word), display=display
+                        )
+        return
+        """Autocompletar con comando anterior"""
         for prev_command in reversed(list(set(self.history.get_strings()))):
             if prev_command.startswith(line) and len(line.split(" ")) > 2:
                 yield Completion(
@@ -142,8 +88,6 @@ class CustomCompleter(Completer):
                     start_position=-len(line),
                     display=HTML("<b>%s</b>") % prev_command,
                 )
-        if document.char_before_cursor == " ":
-            return
 
         for option in self.k8s_options:
             if option.startswith(word):
@@ -154,8 +98,6 @@ class CustomCompleter(Completer):
 
     def add_options(self, new_options):
         """Añade nuevas opciones al conjunto de opciones de autocompletado."""
-        self.k8s_options.update(new_options)
 
     def reset_options(self):
         """Restablece las opciones de autocompletado a su estado inicial."""
-        self.k8s_options = set(k8s_options)
