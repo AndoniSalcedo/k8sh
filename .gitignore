@@ -1,4 +1,6 @@
 /app
 /bootstrap/__pycache__
 /k8sh*
+/__pycache__/*
+.k8sh_history
 application_version.txt
