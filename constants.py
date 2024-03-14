@@ -1,5 +1,5 @@
 k8s_verbs = [
-    "clear"
+    "clear",
     "apply",
     "exit",
 ]
