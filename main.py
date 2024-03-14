@@ -1,7 +1,5 @@
-import resource
 import subprocess
 import re
-from matplotlib.pyplot import flag
 from prompt_toolkit.shortcuts import prompt, CompleteStyle
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.styles import Style
@@ -73,7 +71,7 @@ def main():
                 available_namespaces = get_namespaces(Configuration().flags)
                 new_namespace = user_input.split(" ")[1]
                 if new_namespace in available_namespaces:
-                    Configuration.set_namespace(new_namespace)
+                    Configuration().set_namespace(new_namespace)
 
                     print(f"Namespace cambiado a '{Configuration().current_namespace}'")
                 else:
