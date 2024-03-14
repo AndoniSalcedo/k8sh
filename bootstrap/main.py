@@ -13,8 +13,8 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 github_user = "AndoniSalcedo"
 repository = "k8sh"
 # launcher_version_file = '/path/to/launcher_version.txt'
-application_version_file = os.path.join(script_path,"../application_version.txt")
-application_path = os.path.join(script_path,"../app")
+application_version_file = os.path.join(script_path, "../application_version.txt")
+application_path = os.path.join(script_path, "../app")
 # temp_path = '/temporary/path/for/update'
 
 
@@ -100,6 +100,17 @@ def update_if_needed():
         print("Updating application...")
         if download_and_extract_zip(zip_url_application, application_path):
             update_version("application", new_application_version)
+
+            subprocess.run(
+                [
+                    "pip",
+                    "install",
+                    "-r",
+                    os.path.join(application_path, "requirements.txt"),
+                ]
+                + sys.argv[1:]
+            )
+
             print("Application updated.")
 
 

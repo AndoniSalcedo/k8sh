@@ -5,7 +5,6 @@ setup(
     version="1.0.0",
     packages=find_packages(),
     install_requires=[
-        "prompt_toolkit==3.0.39",
         "requests"
     ],
     entry_points={
