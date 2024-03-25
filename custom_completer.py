@@ -79,7 +79,7 @@ class CustomCompleter(Completer):
                         display=HTML("<b>%s</b>") % prev_command,
                     )
         except ParseException:
-            if line:
+            if line and len(line.split(" ")) < 2:
                 for verb in k8s_all_verbs:
                     if verb.startswith(word):
                         display_width = (terminal_width // 3) - 2
