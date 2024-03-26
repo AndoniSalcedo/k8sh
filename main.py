@@ -9,6 +9,10 @@ from custom_completer import CustomCompleter
 import os
 from prompt_toolkit import HTML
 import argparse
+from pyparsing import ParseResults
+from grammar import kubectlCommand, flagCommand
+
+from constants import k8s_flags
 
 style = Style.from_dict(
     {
@@ -78,24 +82,45 @@ def main():
                     print(f"Namespace '{new_namespace}' no encontrado")
                 continue
 
-            if user_input.startswith("reset"):
-                completer.reset_options()
-                continue
-
-            user_input = (
+            final_user_input = (
                 f"kubectl {flags} -n {Configuration().current_namespace} {user_input}"
             )
 
             result = subprocess.run(
-                user_input,
+                final_user_input,
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
             )
             combined_output = result.stdout + result.stderr
-
+            
             print(combined_output, end="")
+
+            parsed = kubectlCommand.parseString(user_input, parseAll=True)
+            for value in parsed:
+                if isinstance(value, ParseResults):
+
+                    if len(value) == 1 and isinstance(value[0], str):
+                        value_to_process = value[0]  
+                    else:
+                        value_to_process = " ".join(list(value))  # 
+                else:
+                    value_to_process = value
+                    
+                p = flagCommand.parseString(value_to_process,parseAll=False)
+                for _, x in p.items():
+           
+                    if len(x) > 1:
+                        key,val = x
+                  
+                        if key in k8s_flags:
+                            k8s_flags[key].append(val)
+                        else:
+                            k8s_flags[key] = [val]
+                    else:
+                        key = x.pop()
+                        k8s_flags[key] = []
 
         except KeyboardInterrupt:
             print("\nPara salir del programa, escribe 'exit'")

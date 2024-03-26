@@ -7,6 +7,7 @@ k8s_verbs = [
 
 k8s_verbs_name = [
     "logs",
+    "use",
 ]
 
 k8s_verbs_resource_name = [
@@ -15,7 +16,6 @@ k8s_verbs_resource_name = [
     "describe",
     "edit",
     "delete",
-    "use",
     "exec",
 ]
 
@@ -41,6 +41,7 @@ k8s_all_verbs = list(
     )
 )
 
+k8s_flags = {}
 
+k8s_api_resources = get_api_resources()
 
-k8s_resources = get_api_resources()

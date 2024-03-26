@@ -8,16 +8,17 @@ from pyparsing import (
     Literal,
     Combine,
     alphanums,
-    NotAny
+    NotAny,
 )
 
 from constants import (
     k8s_all_verbs,
-    k8s_resources,
     k8s_verbs,
     k8s_verbs_name,
     k8s_verbs_resource_name,
 )
+
+from api_service import get_api_resources
 
 verbs_all = oneOf(" ".join(k8s_all_verbs))
 
@@ -29,15 +30,13 @@ verbs_resource_name = oneOf(" ".join(k8s_verbs_resource_name))
 
 name = Word(alphanums + "-_")
 
-resource = oneOf(" ".join(k8s_resources))
+resource = oneOf(" ".join(get_api_resources()))
 not_resource = NotAny(resource) + name
-
-notAllowedValues = verbs_all | resource
 
 flagKeyword = Combine(Literal("-") + Word(alphas, exact=1)) | Combine(
     Literal("--") + Word(alphanums + "-")
 )
-flagValue = ~(notAllowedValues) + Word(alphanums + "-_.:/")
+flagValue = Combine(Word(alphanums, exact=1) + Optional(Word(alphanums + "-_.:/")))
 flag = Group(flagKeyword + Optional(flagValue))
 
 verb_resouce_name = (
@@ -51,4 +50,6 @@ verb_name = verbs_name("name flags") + Optional(name("flags")) + ZeroOrMore(flag
 kubectlCommand = verb_resouce_name | verb_name
 
 typeCommand = resource("resource") | not_resource
+
+flagCommand = flag("flag") | NotAny(flag)
 
