@@ -43,3 +43,5 @@ k8s_all_verbs = list(
 
 k8s_flags = {}
 
+k8s_api_resources = get_api_resources()
+

@@ -1,11 +1,10 @@
 import shutil
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit import HTML
-from api_service import get_resources, get_api_resources
+from api_service import get_resources
 from configuration import Configuration
-import re
 from grammar import kubectlCommand, typeCommand
-from constants import k8s_all_verbs, k8s_flags
+from constants import k8s_all_verbs, k8s_flags, k8s_api_resources
 from pyparsing import ParseException
 
 
@@ -117,7 +116,7 @@ class CustomCompleter(Completer):
                             )
 
                 if part == "resource":
-                    for resource in get_api_resources():
+                    for resource in k8s_api_resources:
                         if resource.startswith(word):
                             display_width = (terminal_width // 3) - 2
                             display = HTML("<b>%s</b>") % resource.ljust(display_width)
