@@ -49,7 +49,7 @@ class CustomCompleter(Completer):
                                         key, start_position=-len(word), display=display
                                     )
                                 else:
-                                    for value in values:
+                                    for value in list(values):
                                         output = f"{key} {value}"
                                         display_width = (terminal_width // 3) - 2
                                         display = HTML("<b>%s</b>") % output.ljust(
@@ -62,7 +62,7 @@ class CustomCompleter(Completer):
                                         )
                     else:
                         if last_word in k8s_flags.keys() and k8s_flags[last_word]:
-                            for value in k8s_flags[last_word]:
+                            for value in list(k8s_flags[last_word]):
                                 if value.startswith(word):
                                     display_width = (terminal_width // 3) - 2
                                     display = HTML("<b>%s</b>") % value.ljust(
@@ -143,6 +143,3 @@ class CustomCompleter(Completer):
                         yield Completion(
                             verb, start_position=-len(word), display=display
                         )
-            else:
-                #TODO: delete
-                yield Completion("sin opciones", start_position=-len(word))
