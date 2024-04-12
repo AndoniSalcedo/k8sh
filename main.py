@@ -110,14 +110,13 @@ def main():
                     
                 p = flagCommand.parseString(value_to_process,parseAll=False)
                 for _, x in p.items():
-           
                     if len(x) > 1:
                         key,val = x
                   
                         if key in k8s_flags:
-                            k8s_flags[key].append(val)
+                            k8s_flags[key].add(val)
                         else:
-                            k8s_flags[key] = [val]
+                            k8s_flags[key] = set((val))
                     else:
                         key = x.pop()
                         k8s_flags[key] = []
