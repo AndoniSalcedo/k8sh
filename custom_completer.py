@@ -27,7 +27,7 @@ class CustomCompleter(Completer):
 
             for part in parts:
                 if part == "flags":
-                    yield from self.handle_flags(word, last_word)
+                    yield from self.handle_flags(word, last_word,line.split()[0])
 
                 if part == "name":
                     yield from self.handle_name(line, word)
@@ -68,9 +68,12 @@ class CustomCompleter(Completer):
             line = line[: line.rfind(" ")].strip()
         return line, word, last_word
 
-    def handle_flags(self, word, last_word):
+    def handle_flags(self, word, last_word, verb):
+        if verb not in k8s_flags:
+            return    
+        k8s_verb_flags = k8s_flags[verb]
         if word:
-            for key, values in k8s_flags.items():
+            for key, values in k8s_verb_flags.items():
                 if key.startswith(word):
                     if not values:
                         yield self.create_completion(key, len(word))
@@ -79,14 +82,14 @@ class CustomCompleter(Completer):
                             completion_key = f"{key} {value}"
                             yield self.create_completion(completion_key, len(word))
         else:
-            if last_word and last_word in k8s_flags:
-                values = k8s_flags[last_word]
+            if last_word and last_word in k8s_verb_flags:
+                values = k8s_verb_flags[last_word]
                 if values:
                     for value in values:
                         if value.startswith(word):
                             yield self.create_completion(value, len(word))
             else:
-                for key, values in k8s_flags.items():
+                for key, values in k8s_verb_flags.items():
                     if not values:
                         yield self.create_completion(key, len(word))
                     else:

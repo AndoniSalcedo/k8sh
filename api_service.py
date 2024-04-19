@@ -42,5 +42,5 @@ def get_pods(flags, namespace):
 
 
 def get_namespaces(flags):
-   return get_resources(flags,"","namespace")
+    return get_resources(flags,"","namespace")
 
