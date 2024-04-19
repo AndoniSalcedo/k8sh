@@ -96,11 +96,10 @@ def main():
             combined_output = result.stdout + result.stderr
             
             print(combined_output, end="")
-
+            
             parsed = kubectlCommand.parseString(user_input, parseAll=True)
             for value in parsed:
                 if isinstance(value, ParseResults):
-
                     if len(value) == 1 and isinstance(value[0], str):
                         value_to_process = value[0]  
                     else:
@@ -111,12 +110,11 @@ def main():
                 p = flagCommand.parseString(value_to_process,parseAll=False)
                 for _, x in p.items():
                     if len(x) > 1:
-                        key,val = x
-                  
-                        if key in k8s_flags:
-                            k8s_flags[key].add(val)
-                        else:
-                            k8s_flags[key] = set((val))
+                        key,val = x         
+                        if key not in k8s_flags:
+                            k8s_flags[key] = set()
+                        
+                        k8s_flags[key].add(val)
                     else:
                         key = x.pop()
                         k8s_flags[key] = []
