@@ -95,29 +95,33 @@ def main():
             )
             combined_output = result.stdout + result.stderr
             
+            
             print(combined_output, end="")
             
+            
+            if (result.returncode != 0):
+                continue
+            
             parsed = kubectlCommand.parseString(user_input, parseAll=True)
+            verb = parsed[0]
             for value in parsed:
                 if isinstance(value, ParseResults):
                     if len(value) == 1 and isinstance(value[0], str):
                         value_to_process = value[0]  
                     else:
-                        value_to_process = " ".join(list(value))  # 
+                        value_to_process = " ".join(list(value))  
                 else:
                     value_to_process = value
-                    
-                p = flagCommand.parseString(value_to_process,parseAll=False)
-                for _, x in p.items():
-                    if len(x) > 1:
-                        key,val = x         
-                        if key not in k8s_flags:
-                            k8s_flags[key] = set()
-                        
-                        k8s_flags[key].add(val)
+                if(flagCommand.matches(value_to_process) and verb in k8s_flags):
+                    flag = value_to_process.split(" ")
+                    if len(flag) > 1:
+                        key,val = flag         
+                        if key not in k8s_flags[verb]:
+                            k8s_flags[verb][key] = set()
+                        k8s_flags[verb][key].add(val)
                     else:
-                        key = x.pop()
-                        k8s_flags[key] = []
+                        key = flag.pop()
+                        k8s_flags[verb][key] = []
 
         except KeyboardInterrupt:
             print("\nPara salir del programa, escribe 'exit'")
@@ -133,7 +137,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # Verifica si args.kubeconfig es None
     if args.kubeconfig is None:
         flags = ""
     else:
