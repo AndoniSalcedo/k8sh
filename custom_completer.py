@@ -27,7 +27,8 @@ class CustomCompleter(Completer):
 
             for part in parts:
                 if part == "flags":
-                    yield from self.handle_flags(word, last_word,line.split()[0])
+                    verb = line.split()[0]
+                    yield from self.handle_flags(word, last_word,verb)
 
                 if part == "name":
                     yield from self.handle_name(line, word)
@@ -36,7 +37,6 @@ class CustomCompleter(Completer):
                     yield from self.handle_resource(word)
 
             """Autocompletar con comando anterior"""
-            """ 
             for prev_command in reversed(list(set(self.history.get_strings()))):
                 if (
                     prev_command.startswith(document.current_line_before_cursor)
@@ -47,7 +47,6 @@ class CustomCompleter(Completer):
                         start_position=-len(document.current_line_before_cursor),
                         display=HTML("<b>%s</b>") % prev_command,
                     )
-            """
         except ParseException:
             if line and len(line.split(" ")) < 2:
                 for verb in k8s_all_verbs:
@@ -100,10 +99,8 @@ class CustomCompleter(Completer):
     def handle_name(self, line, word):
         type = "pods"  if not line.startswith("use") else "namespaces"  
         for w in line.split(" "):
-            parsed = typeCommand.parseString(w, parseAll=True)
-            for key in parsed.keys():
-                if key == "resource":
-                    type = parsed[key]
+            if(typeCommand.matches(w)):
+                    type = w
 
         resources = get_resources(
             Configuration().flags, Configuration().current_namespace, type
