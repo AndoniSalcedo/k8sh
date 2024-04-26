@@ -3,11 +3,16 @@ k8s_verbs = [
     "clear",
     "apply",
     "exit",
+    "version",
+    "api-resources",
+    "proxy",
 ]
 
 k8s_verbs_name = [
     "logs",
     "use",
+    "scale",
+    "attach",
 ]
 
 k8s_verbs_resource_name = [
@@ -17,23 +22,19 @@ k8s_verbs_resource_name = [
     "edit",
     "delete",
     "exec",
+    "top",
+    "expose",
 ]
 
 k8s_all_verbs = list(
     set(
         [
             # TODO position
-            "scale",
             "rollout",
-            "expose",
-            "attach",
             "port-forward",
-            "proxy",
             "auth",
-            "api-resources",
-            "top",
             "config",
-            "version",
+            
         ]
         + k8s_verbs
         + k8s_verbs_name

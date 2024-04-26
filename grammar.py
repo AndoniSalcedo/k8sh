@@ -11,10 +11,18 @@ from pyparsing import (
     Keyword,
 )
 
-from constants import k8s_verbs_name, k8s_verbs_resource_name, k8s_api_resources
+from constants import (
+    k8s_verbs,
+    k8s_verbs_name,
+    k8s_verbs_resource_name,
+    k8s_api_resources,
+)
 
-verbs_name =  MatchFirst([Keyword(v).setName("verb") for v in k8s_verbs_name])
-verbs_resource_name =  MatchFirst([Keyword(v).setName("verb") for v in k8s_verbs_resource_name])
+verbs = MatchFirst([Keyword(v).setName("verb") for v in k8s_verbs])
+verbs_name = MatchFirst([Keyword(v).setName("verb") for v in k8s_verbs_name])
+verbs_resource_name = MatchFirst(
+    [Keyword(v).setName("verb") for v in k8s_verbs_resource_name]
+)
 name = Word(alphas, alphanums + "-_").setName("name")
 
 resource = MatchFirst([Keyword(r).setName("resource") for r in k8s_api_resources])
@@ -36,10 +44,15 @@ verb_resource_name = (
 )
 
 verb_name = (
-    verbs_name("name") + ZeroOrMore(flag)("name") + name("flags") + ZeroOrMore(flag)
+    verbs_name("name")
+    + ZeroOrMore(flag)("name")
+    + name("flags")
+    + ZeroOrMore(flag("flag"))
 )
 
-kubectlCommand = (verb_resource_name | verb_name).setName("verb")
+verb = verbs("flags") + ZeroOrMore(flag("flags"))
+
+kubectlCommand = (verb_resource_name | verb_name | verb).setName("verb")
 
 typeCommand = resource("resource")
 
