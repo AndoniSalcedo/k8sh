@@ -5,6 +5,7 @@ from configuration import Configuration
 from grammar import kubectlCommand, typeCommand
 from constants import k8s_all_verbs, k8s_flags, k8s_api_resources
 from api_service import get_resources
+from language_processor import find_closest_input
 from pyparsing import ParseException
 
 class CustomCompleter(Completer):
@@ -13,9 +14,24 @@ class CustomCompleter(Completer):
 
     def get_completions(self, document, _):
         line, word, last_word = self.handle_line(document)
+        yield from self.handle_command(line,word,last_word)
+
+    def handle_line(self, document):
+        line = document.current_line_before_cursor
+        word = line.split(" ")[-1]
+        if len(line.split(" ")) > 1:
+            last_word = line.split(" ")[-2]
+        else:
+            last_word = ""
+        if line.endswith(" ") or " " not in line:
+            line = line.strip()
+        else:
+            line = line[: line.rfind(" ")].strip()
+        return line, word, last_word
+
+    def handle_command(self,line,word,last_word):
         try:
             parsed = kubectlCommand.parseString(line,parseAll=True)
-
             next = list(parsed.keys()).pop()
             parts = next.split(" ")
 
@@ -31,26 +47,18 @@ class CustomCompleter(Completer):
             yield from self.handle_prev_command(line, word)
 
         except ParseException as pe:
-            if "verb" == str(pe.parserElement) and not last_word:
-                yield from self.handle_verb(word)
+            if "verb" == str(pe.parserElement):
+                if(not last_word):
+                    yield from self.handle_verb(word)
+                else:
+                    closest_line = find_closest_input(line)
+                    yield self.create_completion(closest_line,len(closest_line))
+                    yield from self.handle_command(closest_line,word,last_word)
             if "resource" == str(pe.parserElement):
                 yield from self.handle_resource(word)
             if "name" == str(pe.parserElement):
-                yield from self.handle_name(line, word)        
-
-    def handle_line(self, document):
-        line = document.current_line_before_cursor
-        word = line.split(" ")[-1]
-        if len(line.split(" ")) > 1:
-            last_word = line.split(" ")[-2]
-        else:
-            last_word = ""
-        if line.endswith(" ") or " " not in line:
-            line = line.strip()
-        else:
-            line = line[: line.rfind(" ")].strip()
-        return line, word, last_word
-
+                yield from self.handle_name(line, word)
+    
     def handle_verb(self, word):
         for verb in k8s_all_verbs:
             if verb.startswith(word):

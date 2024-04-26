@@ -11,7 +11,7 @@ from prompt_toolkit import HTML
 import argparse
 from pyparsing import ParseResults
 from grammar import kubectlCommand, flagCommand
-from lenguage_processor import find_closest_input
+from language_processor import find_closest_input
 from constants import k8s_flags
 
 style = Style.from_dict(
@@ -93,28 +93,52 @@ def main():
                 text=True,
             )
             combined_output = result.stdout + result.stderr
-            
-            
+
             print(combined_output, end="")
-            
-            if (result.returncode != 0):
-                print("suggested phase: ", find_closest_input(user_input))
+
+            if result.returncode != 0:
+                closest_input = find_closest_input(user_input)
+                final_user_input = (
+                f"kubectl {flags} -n {Configuration().current_namespace} {closest_input}"
+            ) 
+                confirmation_prompt = HTML(
+                    f'<path>{Configuration().current_directory}</path> <symbol>(</symbol><namespace>{Configuration().current_namespace}</namespace><symbol>)</symbol> <start>$</start> Suggested: "{closest_input}" [Y/n] '
+                )
+                user_input = (
+                    prompt(
+                        confirmation_prompt,
+                        style=style,
+                    )
+                    .strip()
+                    .lower()
+                )
+
+                if user_input != "n":
+                    result = subprocess.run(
+                        final_user_input,
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                    )
+                    combined_output = result.stdout + result.stderr
+                    print(combined_output, end="")
                 continue
-            
+
             parsed = kubectlCommand.parseString(user_input, parseAll=True)
             verb = parsed.pop(0)
             for value in parsed:
                 if isinstance(value, ParseResults):
                     if len(value) == 1 and isinstance(value[0], str):
-                        value_to_process = value[0]  
+                        value_to_process = value[0]
                     else:
-                        value_to_process = " ".join(list(value))  
+                        value_to_process = " ".join(list(value))
                 else:
                     value_to_process = value
-                if(flagCommand.matches(value_to_process) and verb in k8s_flags):
+                if flagCommand.matches(value_to_process) and verb in k8s_flags:
                     flag = value_to_process.split(" ")
                     if len(flag) > 1:
-                        key,val = flag         
+                        key, val = flag
                         if key not in k8s_flags[verb]:
                             k8s_flags[verb][key] = set()
                         k8s_flags[verb][key].add(val)
