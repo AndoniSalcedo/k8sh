@@ -11,7 +11,7 @@ from prompt_toolkit import HTML
 import argparse
 from pyparsing import ParseResults
 from grammar import kubectlCommand, flagCommand
-
+from lenguage_processor import find_closest_input
 from constants import k8s_flags
 
 style = Style.from_dict(
@@ -29,7 +29,6 @@ def main():
     Función principal que ejecuta el bucle principal de la aplicación.
     Permite al usuario ingresar comandos, administrar namespaces y mostrar resultados.
     """
-
     history_file = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), ".k8sh_history"
     )
@@ -98,12 +97,12 @@ def main():
             
             print(combined_output, end="")
             
-            
             if (result.returncode != 0):
+                print("suggested phase: ", find_closest_input(user_input))
                 continue
             
             parsed = kubectlCommand.parseString(user_input, parseAll=True)
-            verb = parsed[0]
+            verb = parsed.pop(0)
             for value in parsed:
                 if isinstance(value, ParseResults):
                     if len(value) == 1 and isinstance(value[0], str):

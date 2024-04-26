@@ -1,5 +1,8 @@
+from pyparsing import ParseException
+from grammar import kubectlCommand, typeCommand
+from constants import k8s_all_verbs, k8s_api_resources
+# TODO: early detencion
 def wagner_fischer(s1, s2):
-
     m = len(s1)
     n = len(s2)
     dp = [[0] * (n + 1) for _ in range(m + 1)]
@@ -21,7 +24,6 @@ def wagner_fischer(s1, s2):
                 dp[i][j - 1] + 1, 
                 dp[i - 1][j - 1] + cost,
             ) 
-
     return dp[m][n]
 
 
@@ -38,4 +40,25 @@ def find_closest_word(input_word, vocabulary):
             closest_word = word
         
 
-    return closest_word, min_distance
+    return closest_word
+
+def find_closest_input(line):
+    try:
+        kubectlCommand.parseString(line)
+
+        return line
+    except ParseException as pe:
+        wrong_word = pe.explain().partition('\'')[-1].rpartition('\'')[0]
+        
+        if "verb" == str(pe.parserElement):
+            vocabulary = k8s_all_verbs
+        elif "resource" == str(pe.parserElement):
+            vocabulary = k8s_api_resources
+        else: 
+            print("el fallo no esta en verb ni resource")
+            return line
+            
+        closest_word = find_closest_word(wrong_word,vocabulary)
+        new_line = pe.pstr.replace(wrong_word,closest_word)
+        
+        return find_closest_input(new_line)
