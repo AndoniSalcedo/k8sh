@@ -9,11 +9,8 @@ from pyparsing import ParseException
 
 
 class CustomCompleter(Completer):
-
     def __init__(self, history):
-
         self.history = history
-
     def get_completions(self, document, _):
 
         line, word, last_word = self.handle_line(document)

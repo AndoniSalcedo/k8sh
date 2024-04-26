@@ -8,8 +8,6 @@ from pyparsing import (
     Literal,
     Combine,
     alphanums,
-    NotAny,
-    White
 )
 
 from constants import (
@@ -40,16 +38,20 @@ flag = Group(flagKey + Optional(flagValue))
 
 verb_resource_name = (
     verbs_resource_name("resource")
-    + ZeroOrMore(flag("resource"))  
+    + ZeroOrMore(flag("resource"))
     + Optional(resource("name flags") + Optional(name("flags")))
     + ZeroOrMore(flag("flags"))
 )
 
-verb_name = verbs_name("name") + ZeroOrMore(flag)("name") + Optional(name("flags")) + ZeroOrMore(flag)
+verb_name = (
+    verbs_name("name")
+    + ZeroOrMore(flag)("name")
+    + Optional(name("flags"))
+    + ZeroOrMore(flag)
+)
 
 kubectlCommand = verb_resource_name | verb_name
 
 typeCommand = resource("resource")
 
 flagCommand = flag("flag")
-
