@@ -98,6 +98,10 @@ def main():
 
             if result.returncode != 0:
                 closest_input = find_closest_input(user_input)
+                
+                if(user_input == closest_input):
+                    continue
+                
                 final_user_input = (
                 f"kubectl {flags} -n {Configuration().current_namespace} {closest_input}"
             ) 
