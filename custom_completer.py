@@ -52,8 +52,9 @@ class CustomCompleter(Completer):
                     yield from self.handle_verb(word)
                 else:
                     closest_line = find_closest_input(line)
-                    yield self.create_completion(closest_line,len(closest_line))
-                    yield from self.handle_command(closest_line,word,last_word)
+                    if (closest_line != line):
+                        yield self.create_completion(closest_line,len(closest_line))
+                        yield from self.handle_command(closest_line,word,last_word)
             if "resource" == str(pe.parserElement):
                 yield from self.handle_resource(word)
             if "name" == str(pe.parserElement):

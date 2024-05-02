@@ -9,7 +9,7 @@ def get_api_resources():
         capture_output=True,
         text=True,
     )
-    all_resources = []
+    all_resources = ["all"]
     resources_spec = result.stdout.strip().split("\n")
     for resource_scpec in resources_spec:
         parts = resource_scpec.split()
@@ -17,6 +17,7 @@ def get_api_resources():
         all_resources.append(parts[-1].lower())
         if len(parts) > 1 and "/" not in parts[1]:
             all_resources.append(parts[1])
+    
     return all_resources
 
 def get_resources(flags, namespace, resource):
