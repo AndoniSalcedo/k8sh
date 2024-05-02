@@ -1,28 +1,27 @@
 from pyparsing import (
-    Word,
     alphas,
+    alphanums,
+    Word,
     Optional,
     Group,
     ZeroOrMore,
     Literal,
     Combine,
-    alphanums,
     MatchFirst,
     Keyword,
 )
 
 from constants import (
-    k8s_verbs,
-    k8s_verbs_name,
-    k8s_verbs_resource_name,
+    k8s_verbs as k8s_v,
+    k8s_verbs_name as k8s_vn,
+    k8s_verbs_resource_name as k8s_vrn,
     k8s_api_resources,
 )
 
-verbs = MatchFirst([Keyword(v).setName("verb") for v in k8s_verbs])
-verbs_name = MatchFirst([Keyword(v).setName("verb") for v in k8s_verbs_name])
-verbs_resource_name = MatchFirst(
-    [Keyword(v).setName("verb") for v in k8s_verbs_resource_name]
-)
+verbs = MatchFirst([Keyword(v).setName("verb") for v in k8s_v])
+verbs_name = MatchFirst([Keyword(v).setName("verb") for v in k8s_vn])
+verbs_resource_name = MatchFirst([Keyword(v).setName("verb") for v in k8s_vrn])
+
 name = Word(alphas, alphanums + "-_").setName("name")
 
 resource = MatchFirst([Keyword(r).setName("resource") for r in k8s_api_resources])

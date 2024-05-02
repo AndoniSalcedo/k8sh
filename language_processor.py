@@ -53,7 +53,6 @@ def find_word_at_index(text, index):
     return text[start:end]
 
 def find_closest_input(line):
-
     try:
         kubectlCommand.parseString(line, parseAll=True)
         return line

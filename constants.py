@@ -34,8 +34,7 @@ k8s_all_verbs = list(
             "rollout",
             "port-forward",
             "auth",
-            "config",
-            
+            "config",  
         ]
         + k8s_verbs
         + k8s_verbs_name
