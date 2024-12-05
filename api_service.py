@@ -1,10 +1,8 @@
 import subprocess
 
-
-def get_api_resources():
-    ''''''
+def get_api_resources(flags):
     result = subprocess.run(
-        f"kubectl api-resources --no-headers",
+        f"kubectl {flags} api-resources --no-headers",
         shell=True,
         capture_output=True,
         text=True,
@@ -18,14 +16,9 @@ def get_api_resources():
         if len(parts) > 1 and "/" not in parts[1]:
             all_resources.append(parts[1])
     
-    return all_resources
+    return list(set(all_resources))
 
 def get_resources(flags, namespace, resource):
-    """
-    Obtiene una lista de los nombres de los namespaces disponibles en Kubernetes.
-    Utiliza el comando 'kubectl get namespaces --no-headers' para obtener la lista.
-    """
-
     if namespace:
         namespace = f"-n {namespace}"
     result = subprocess.run(

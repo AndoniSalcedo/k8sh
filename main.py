@@ -8,7 +8,6 @@ from configuration import Configuration
 from custom_completer import CustomCompleter
 import os
 from prompt_toolkit import HTML
-import argparse
 from pyparsing import ParseResults
 from grammar import kubectlCommand, flagCommand
 from language_processor import find_closest_input
@@ -25,14 +24,9 @@ style = Style.from_dict(
 
 
 def main():
-    """
-    Función principal que ejecuta el bucle principal de la aplicación.
-    Permite al usuario ingresar comandos, administrar namespaces y mostrar resultados.
-    """
     history_file = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), ".k8sh_history"
     )
-
     history = FileHistory(history_file)
     completer = CustomCompleter(history)
 
@@ -69,7 +63,7 @@ def main():
 
                 print(combined_output, end="")
                 continue
-
+            
             if user_input.startswith("use"):
                 available_namespaces = get_namespaces(Configuration().flags)
                 new_namespace = user_input.split(" ")[1]
@@ -80,10 +74,38 @@ def main():
                 else:
                     print(f"Namespace '{new_namespace}' no encontrado")
                 continue
+            
+            if user_input.startswith("watch"):
+                final_user_input = f"watch kubectl {Configuration().flags} -n {Configuration().current_namespace} {user_input.replace('watch', '')}"
 
-            final_user_input = (
-                f"kubectl {flags} -n {Configuration().current_namespace} {user_input}"
-            )
+                try:
+                    process = subprocess.Popen(
+                        final_user_input,
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                    )
+
+                    print("Presiona Ctrl+C para salir del modo watch...\n")
+                    
+                    while True:
+                        output = process.stdout.readline()
+                        if output:
+                            print(output, end="")  
+                        
+                        if process.poll() is not None:
+                            break
+
+                except KeyboardInterrupt:
+                    process.terminate()
+                    print("\nSaliendo del modo watch...")
+                
+                continue
+
+
+            final_user_input = f"kubectl {Configuration().flags} -n {Configuration().current_namespace} {user_input}"
+            
 
             result = subprocess.run(
                 final_user_input,
@@ -103,8 +125,9 @@ def main():
                     continue
                 
                 final_user_input = (
-                f"kubectl {flags} -n {Configuration().current_namespace} {closest_input}"
-            ) 
+                f"kubectl {Configuration().flags} -n {Configuration().current_namespace} {closest_input}"
+                )
+
                 confirmation_prompt = HTML(
                     f'<path>{Configuration().current_directory}</path> <symbol>(</symbol><namespace>{Configuration().current_namespace}</namespace><symbol>)</symbol> <start>$</start> Suggested: "{closest_input}" [Y/n] '
                 )
@@ -129,6 +152,7 @@ def main():
                     print(combined_output, end="")
                 continue
 
+            
             parsed = kubectlCommand.parseString(user_input, parseAll=True)
             verb = parsed.pop(0)
             for value in parsed:
@@ -153,21 +177,7 @@ def main():
         except KeyboardInterrupt:
             print("\nPara salir del programa, escribe 'exit'")
         except Exception as e:
-            print("Error:", e)
+            print("Error: aqui", e)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Kubernetes CLI Tool.")
 
-    parser.add_argument(
-        "--kubeconfig", type=str, help="ruta al archivo kubeconfig", default=None
-    )
-    args = parser.parse_args()
-
-    if args.kubeconfig is None:
-        flags = ""
-    else:
-        flags = f"--kubeconfig {args.kubeconfig}"
-
-    Configuration().set_flags(flags)
-    main()

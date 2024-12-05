@@ -1,4 +1,5 @@
 from api_service import get_api_resources
+from configuration import Configuration
 
 k8s_verbs = [
     "clear",
@@ -34,7 +35,7 @@ k8s_all_verbs = list(
             "rollout",
             "port-forward",
             "auth",
-            "config",  
+            "config", 
         ]
         + k8s_verbs
         + k8s_verbs_name
@@ -42,6 +43,7 @@ k8s_all_verbs = list(
     )
 )
 
-k8s_api_resources = get_api_resources()
+k8s_api_resources = get_api_resources(Configuration().flags)
 
 k8s_flags = {key: {} for key in k8s_all_verbs}
+
