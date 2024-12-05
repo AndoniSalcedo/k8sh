@@ -8,7 +8,6 @@ from configuration import Configuration
 from custom_completer import CustomCompleter
 import os
 from prompt_toolkit import HTML
-import argparse
 from pyparsing import ParseResults
 from grammar import kubectlCommand, flagCommand
 from language_processor import find_closest_input
@@ -32,7 +31,6 @@ def main():
     history_file = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), ".k8sh_history"
     )
-
     history = FileHistory(history_file)
     completer = CustomCompleter(history)
 
@@ -82,7 +80,7 @@ def main():
                 continue
 
             final_user_input = (
-                f"kubectl {flags} -n {Configuration().current_namespace} {user_input}"
+                f"kubectl {Configuration().flags} -n {Configuration().current_namespace} {user_input}"
             )
 
             result = subprocess.run(
@@ -103,7 +101,7 @@ def main():
                     continue
                 
                 final_user_input = (
-                f"kubectl {flags} -n {Configuration().current_namespace} {closest_input}"
+                f"kubectl {Configuration().flags} -n {Configuration().current_namespace} {closest_input}"
             ) 
                 confirmation_prompt = HTML(
                     f'<path>{Configuration().current_directory}</path> <symbol>(</symbol><namespace>{Configuration().current_namespace}</namespace><symbol>)</symbol> <start>$</start> Suggested: "{closest_input}" [Y/n] '
@@ -153,21 +151,7 @@ def main():
         except KeyboardInterrupt:
             print("\nPara salir del programa, escribe 'exit'")
         except Exception as e:
-            print("Error:", e)
+            print("Error: aqui", e)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Kubernetes CLI Tool.")
 
-    parser.add_argument(
-        "--kubeconfig", type=str, help="ruta al archivo kubeconfig", default=None
-    )
-    args = parser.parse_args()
-
-    if args.kubeconfig is None:
-        flags = ""
-    else:
-        flags = f"--kubeconfig {args.kubeconfig}"
-
-    Configuration().set_flags(flags)
-    main()
