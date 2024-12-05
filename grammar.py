@@ -9,6 +9,7 @@ from pyparsing import (
     Combine,
     MatchFirst,
     Keyword,
+    
 )
 
 from constants import (
@@ -51,7 +52,7 @@ verb_name = (
 
 verb = verbs("flags") + ZeroOrMore(flag("flags"))
 
-kubectlCommand = (verb_resource_name | verb_name | verb).setName("verb")
+kubectlCommand = Optional("watch") + (verb_resource_name | verb_name | verb).setName("verb")
 
 typeCommand = resource("resource")
 

@@ -24,10 +24,6 @@ style = Style.from_dict(
 
 
 def main():
-    """
-    Función principal que ejecuta el bucle principal de la aplicación.
-    Permite al usuario ingresar comandos, administrar namespaces y mostrar resultados.
-    """
     history_file = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), ".k8sh_history"
     )
@@ -67,7 +63,7 @@ def main():
 
                 print(combined_output, end="")
                 continue
-
+            
             if user_input.startswith("use"):
                 available_namespaces = get_namespaces(Configuration().flags)
                 new_namespace = user_input.split(" ")[1]
@@ -78,10 +74,38 @@ def main():
                 else:
                     print(f"Namespace '{new_namespace}' no encontrado")
                 continue
+            
+            if user_input.startswith("watch"):
+                final_user_input = f"watch kubectl {Configuration().flags} -n {Configuration().current_namespace} {user_input.replace('watch', '')}"
 
-            final_user_input = (
-                f"kubectl {Configuration().flags} -n {Configuration().current_namespace} {user_input}"
-            )
+                try:
+                    process = subprocess.Popen(
+                        final_user_input,
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                    )
+
+                    print("Presiona Ctrl+C para salir del modo watch...\n")
+                    
+                    while True:
+                        output = process.stdout.readline()
+                        if output:
+                            print(output, end="")  
+                        
+                        if process.poll() is not None:
+                            break
+
+                except KeyboardInterrupt:
+                    process.terminate()
+                    print("\nSaliendo del modo watch...")
+                
+                continue
+
+
+            final_user_input = f"kubectl {Configuration().flags} -n {Configuration().current_namespace} {user_input}"
+            
 
             result = subprocess.run(
                 final_user_input,
@@ -102,7 +126,8 @@ def main():
                 
                 final_user_input = (
                 f"kubectl {Configuration().flags} -n {Configuration().current_namespace} {closest_input}"
-            ) 
+                )
+
                 confirmation_prompt = HTML(
                     f'<path>{Configuration().current_directory}</path> <symbol>(</symbol><namespace>{Configuration().current_namespace}</namespace><symbol>)</symbol> <start>$</start> Suggested: "{closest_input}" [Y/n] '
                 )
@@ -127,6 +152,7 @@ def main():
                     print(combined_output, end="")
                 continue
 
+            
             parsed = kubectlCommand.parseString(user_input, parseAll=True)
             verb = parsed.pop(0)
             for value in parsed:
