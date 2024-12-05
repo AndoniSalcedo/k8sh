@@ -77,16 +77,6 @@ def download_and_extract_zip(zip_url, destination_path):
 
 
 def update_if_needed():
-    """current_launcher_version = read_current_version('launcher')
-    new_launcher_version, _ = get_latest_github_version('launcher')
-     if new_launcher_version and new_launcher_version != current_launcher_version:
-        # Update launcher
-        print("Updating launcher...")
-        if download_and_extract_zip(_, temp_path):  # Assumes you have a specific URL to download the launcher
-            update_version('launcher', new_launcher_version)
-            # Here you would add logic to overwrite the current launcher with the new one
-            subprocess.Popen(["python", __file__])  # Restart the launcher
-            exit()"""
 
     current_application_version = read_current_version("application")
     new_application_version, zip_url_application = get_latest_github_version(
@@ -103,7 +93,7 @@ def update_if_needed():
 
             subprocess.run(
                 [
-                    "pip",
+                    "pip3",
                     "install",
                     "-r",
                     os.path.join(application_path, "requirements.txt"),
@@ -114,14 +104,11 @@ def update_if_needed():
             print("Application updated.")
 
 
-# Launcher start
-
-
 def main():
     update_if_needed()
 
     subprocess.run(
-        ["python3", os.path.join(application_path, "main.py")] + sys.argv[1:]
+        ["python3", os.path.join(application_path, "init.py")] + sys.argv[1:]
     )
 
 

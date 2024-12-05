@@ -1,4 +1,4 @@
 #/bin/bash
 
-pip install setuptools
-pip install -e .
+pip3 install setuptools
+pip3 install -e .

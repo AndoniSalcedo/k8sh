@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "k8sh"
+version = "0.0.2"
+dependencies = [
+    "requests",
+]
+[tool.setuptools.packages]
+find = {}
+[project.scripts]
+k8sh = "bootstrap.main:main"
+[project.urls]
+Repository = "https://github.com/AndoniSalcedo/k8sh"
