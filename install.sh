@@ -11,9 +11,16 @@ INSTALL_DIR="$HOME/.k8sh"
 echo "=> Creating installation directory at $INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
 
-# 2. Copy project files
-echo "=> Copying project files..."
-cp -R ./* "$INSTALL_DIR/"
+# 2. Get project files
+if [ -f "./init.py" ] && [ -f "./main.py" ]; then
+    echo "=> Local copy detected. Copying project files..."
+    cp -R ./* "$INSTALL_DIR/"
+else
+    echo "=> Downloading latest version from GitHub..."
+    git clone https://github.com/AndoniSalcedo/k8sh.git "$INSTALL_DIR"
+fi
+
+cd "$INSTALL_DIR"
 
 # 3. Setup python virtual environment
 echo "=> Setting up virtual environment..."
