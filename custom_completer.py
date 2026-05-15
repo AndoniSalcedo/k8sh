@@ -31,7 +31,7 @@ class CustomCompleter(Completer):
 
     def handle_command(self,line,word,last_word):
         try:
-            parsed = kubectlCommand.parseString(line,parseAll=True)
+            parsed = kubectlCommand.parse_string(line, parse_all=True)
             next = list(parsed.keys()).pop()
             parts = next.split(" ")
 
@@ -47,7 +47,8 @@ class CustomCompleter(Completer):
             yield from self.handle_prev_command(line, word)
 
         except ParseException as pe:
-            if "verb" == str(pe.parserElement):
+            pe_name = getattr(pe.parser_element, "name", None)
+            if "verb" == pe_name:
                 if(not last_word):
                     yield from self.handle_verb(word)
                 else:
@@ -55,14 +56,14 @@ class CustomCompleter(Completer):
                     if (closest_line != line):
                         yield self.create_completion(closest_line,len(closest_line))
                         yield from self.handle_command(closest_line,word,last_word)
-            if "resource" == str(pe.parserElement):
+            if "resource" == pe_name:
                 yield from self.handle_resource(word)
-            if "name" == str(pe.parserElement):
+            if "name" == pe_name:
                 yield from self.handle_name(line, word)
     
     def handle_verb(self, word):
         for verb in k8s_all_verbs:
-            if verb.startswith(word):
+            if word in verb:
                 yield self.create_completion(verb, len(word))
         
     def handle_flags(self, word, last_word, verb):
@@ -71,7 +72,7 @@ class CustomCompleter(Completer):
         k8s_verb_flags = k8s_flags[verb]
         if word:
             for key, values in k8s_verb_flags.items():
-                if key.startswith(word):
+                if word in key:
                     if not values:
                         yield self.create_completion(key, len(word))
                     else:
@@ -83,7 +84,7 @@ class CustomCompleter(Completer):
                 values = k8s_verb_flags[last_word]
                 if values:
                     for value in values:
-                        if value.startswith(word):
+                        if word in value:
                             yield self.create_completion(value, len(word))
             else:
                 for key, values in k8s_verb_flags.items():
@@ -105,12 +106,12 @@ class CustomCompleter(Completer):
         )
 
         for resource in resources:
-            if resource.startswith(word):
+            if word in resource:
                 yield self.create_completion(resource, len(word))
 
     def handle_resource(self, word):
         for resource in k8s_api_resources:
-            if resource.startswith(word):
+            if word in resource:
                 yield self.create_completion(resource, len(word))
 
     def handle_prev_command(self, line, word):
