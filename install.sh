@@ -24,7 +24,17 @@ cd "$INSTALL_DIR"
 
 # 3. Setup python virtual environment
 echo "=> Setting up virtual environment..."
-python3 -m venv "$INSTALL_DIR/venv"
+if ! python3 -m venv "$INSTALL_DIR/venv" > /dev/null 2>&1; then
+    echo ""
+    echo "❌ ERROR: Failed to create virtual environment."
+    echo "It seems 'python3-venv' is not installed on your system (very common on Ubuntu/Debian)."
+    echo "Please install it by running the following command:"
+    echo ""
+    echo "    sudo apt update && sudo apt install -y python3-venv"
+    echo ""
+    echo "After installing it, simply run this installation command again!"
+    exit 1
+fi
 
 echo "=> Installing dependencies..."
 "$INSTALL_DIR/venv/bin/pip" install --upgrade pip > /dev/null 2>&1
