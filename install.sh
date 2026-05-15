@@ -7,17 +7,22 @@ echo "=========================================="
 
 INSTALL_DIR="$HOME/.k8sh"
 
-# 1. Create installation directory
-echo "=> Creating installation directory at $INSTALL_DIR"
-mkdir -p "$INSTALL_DIR"
-
-# 2. Get project files
+# 1. Get project files
 if [ -f "./init.py" ] && [ -f "./main.py" ]; then
     echo "=> Local copy detected. Copying project files..."
+    mkdir -p "$INSTALL_DIR"
     cp -R ./* "$INSTALL_DIR/"
 else
-    echo "=> Downloading latest version from GitHub..."
-    git clone https://github.com/AndoniSalcedo/k8sh.git "$INSTALL_DIR"
+    if [ -d "$INSTALL_DIR/.git" ]; then
+        echo "=> Existing installation detected. Updating from GitHub..."
+        cd "$INSTALL_DIR"
+        git fetch --all > /dev/null 2>&1
+        git reset --hard origin/master > /dev/null 2>&1
+    else
+        echo "=> Downloading latest version from GitHub..."
+        rm -rf "$INSTALL_DIR"
+        git clone https://github.com/AndoniSalcedo/k8sh.git "$INSTALL_DIR"
+    fi
 fi
 
 cd "$INSTALL_DIR"
